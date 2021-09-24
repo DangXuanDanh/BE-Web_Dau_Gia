@@ -26,6 +26,9 @@ SanPham.init({
         //     isInt: true,
         // }
     },
+    mota: {
+        type: Sequelize.TEXT,
+    },
     loaisanpham: {
         type: Sequelize.STRING,
     },
@@ -35,8 +38,18 @@ SanPham.init({
     giakhoidiem: {
         type: Sequelize.DECIMAL,
     },
+    giamuangay: {
+        type: Sequelize.DECIMAL,
+    },
+    buocgia: {
+        type: Sequelize.DECIMAL,
+    },
     malichsucaonhat: {
         type: Sequelize.INTEGER,
+    },
+    tudonggiahan: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     },
     ngaydang:{
         type: 'TIMESTAMP',
