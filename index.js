@@ -26,6 +26,10 @@ app.get('/', function (req, res) {
     });
 })
 
+app.use('/API/sanpham', require('./routes/API/sanpham.api'))
+app.use('/API/lichsudaugia', require('./routes/API/lichsudaugia.api'))
+const AnhSanPham = require('./models/anhsanpham.model');
+
 app.listen(PORT, async function () {
     console.log(`Server is running at http://localhost:${PORT}`);
 
