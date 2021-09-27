@@ -56,8 +56,8 @@ SanPham.init({
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         allowNull: false
     },
-    songaykethuc: {
-        type: Sequelize.INTEGER,
+    ngayketthuc: {
+        type: 'TIMESTAMP',
     },
 }, {
     // Other model options go here
