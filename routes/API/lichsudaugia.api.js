@@ -2,6 +2,7 @@ const express = require('express');
 const app = new express.Router();
 
 const LichSuDauGia = require('../../models/lichsudaugia.model');
+const SanPham = require('../../models/sanpham.model');
 
 function validate() {
     return async function (req, res, next) {
@@ -27,17 +28,34 @@ app.route('/:id')
     .get(async function (req, res) {
         res.status(200).json(await LichSuDauGia.findOne({
             where: {
-                malichsudaugia: req.params.malichsudaugia
+                malichsudaugia: req.params.id
             }
         }));
     })
     .delete(async function (req, res, next) {
         customer = await LichSuDauGia.destroy({
             where: {
-                malichsudaugia: req.params.malichsudaugia,
+                malichsudaugia: req.params.id,
             },
         });
         res.status(204).json(customer);
+    })
+
+app.route('/sanpham/:id')
+    .all(async function (req, res, next) {
+        next()
+    })
+    .get(async function (req, res, next) {
+        customers = await LichSuDauGia.findAll({
+            order: [
+                ['ngaydaugia', 'DESC']
+            ],
+            limit: 5 ,
+            where: {
+                masanpham: req.params.id
+            }
+        });
+        res.status(200).json(customers);
     })
 
 app.route('/')
@@ -49,9 +67,7 @@ app.route('/')
             order: [
                 ['ngaydaugia', 'DESC']
             ],
-            where:{
-                masanpham: req.params.masanpham
-            }
+            // include: SanPham
         });
         res.status(200).json(customers);
     })
@@ -63,7 +79,7 @@ app.route('/')
         });
         res.status(200).json(customer);
     })
-    .put(validate(),async function (req, res, next) {
+    .put(validate(), async function (req, res, next) {
         customer = await LichSuDauGia.update({
             masanpham: req.body.masanpham,
             mataikhoan: req.body.mataikhoan,

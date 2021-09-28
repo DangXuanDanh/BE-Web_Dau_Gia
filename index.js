@@ -4,7 +4,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const pg = require('pg');
 
+
 const db = require('./services/db');
+require('./models/relations');
 
 
 const PORT = process.env.BACKEND_PORT || 3000;
