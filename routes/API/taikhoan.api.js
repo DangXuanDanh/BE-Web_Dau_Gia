@@ -29,11 +29,13 @@ app.route('/login')
         return res.status(403).end();
     }else{
         const user = await TaiKhoan.findByMail(body.email);
-        if(user === null)
+        console.log(user.hoten);
+        if(user != null)
         {
-            return res.status(204).end();
+            return res.status(204).json(user);
         }
     }
+    return res.status(205).end();
 })
 
 

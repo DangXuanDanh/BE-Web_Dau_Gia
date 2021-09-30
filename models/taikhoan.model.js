@@ -6,12 +6,16 @@ const Model = Sequelize.Model
 class TaiKhoan extends Model {
   
     static async findByMail(email) {
-        const rows = await db(tableName).where('email','like',email);
+        const rows = await TaiKhoan.findOne({
+            where :{
+                email,
+            }
+        })
         if(rows.length === 0)
         {
             return null;
         }
-        return rows[0];
+        return rows;
     }
 }
 // chat Table Created Method
