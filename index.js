@@ -30,6 +30,7 @@ app.get('/', function (req, res) {
 
 app.use('/API/sanpham', require('./routes/API/sanpham.api'))
 app.use('/API/lichsudaugia', require('./routes/API/lichsudaugia.api'))
+app.use('/API/user', require('./routes/API/taikhoan.api'))
 const AnhSanPham = require('./models/anhsanpham.model');
 
 app.listen(PORT, async function () {
