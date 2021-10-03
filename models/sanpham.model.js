@@ -30,7 +30,7 @@ SanPham.init({
         type: Sequelize.TEXT,
     },
     madanhmuc: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
     },
     maanhdaidien: {
         type: Sequelize.INTEGER,
