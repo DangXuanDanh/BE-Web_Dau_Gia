@@ -29,7 +29,7 @@ SanPham.init({
     mota: {
         type: Sequelize.TEXT,
     },
-    loaisanpham: {
+    madanhmuc: {
         type: Sequelize.STRING,
     },
     maanhdaidien: {
