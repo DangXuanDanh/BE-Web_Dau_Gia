@@ -20,7 +20,7 @@ DanhMuc.init({
         autoIncrement: true
     },
     tendanhmuc: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
     },
 }, {
     // Other model options go here
