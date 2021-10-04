@@ -58,41 +58,31 @@ app.route('/')
     })
     .post(validate(),async function (req, res, next) {
 
-        let days = parseInt(req.body.songayketthuc) || 0
-
-        let time = new Date()
-        time.setDate(time.getDate() + days)
-
         actor = await SanPham.create({
             tensanpham: req.body.tensanpham,
             mota: req.body.mota,
-            loaisanpham: req.body.loaisanpham,
+            madanhmuc: req.body.madanhmuc,
             maanhdaidien: req.body.maanhdaidien,
             giakhoidiem: req.body.giakhoidiem,
             giamuangay: req.body.giamuangay,
             buocgia: req.body.buocgia,
             tudonggiahan: req.body.tudonggiahan,
-            ngayketthuc: time
+            ngayketthuc: req.body.ngayketthuc
         });
         res.status(200).json(actor);
     })
     .put(validate(),async function (req, res, next) {
 
-        let days = parseInt(req.body.songayketthuc) || 0
-
-        let time = new Date()
-        time.setDate(time.getDate() + days)
-
         actor = await SanPham.update({
             tensanpham: req.body.tensanpham,
             mota: req.body.mota,
-            loaisanpham: req.body.loaisanpham,
+            madanhmuc: req.body.madanhmuc,
             maanhdaidien: req.body.maanhdaidien,
             giakhoidiem: req.body.giakhoidiem,
             giamuangay: req.body.giamuangay,
             buocgia: req.body.buocgia,
             tudonggiahan: req.body.tudonggiahan,
-            ngayketthuc: time
+            ngayketthuc: req.body.ngayketthuc
         },
             {
                 where: {
