@@ -51,5 +51,33 @@ app.route('/login')
 
 })
 
+app.route('/profile/:userId')
+.get(async (req, res)=> {
+    const id = req.params.userId || 0;
+    if (id === 0 || id === null) {
+        return res.status(404).end();
+    }
+    else{
+        var result = await TaiKhoan.findById(id);
+        if (result === 0 || result === null) {
+            return res.status(404).end();
+        }
+        else{
+            var formatted_date = null;
+            if(result.ngaysinh != null)
+            {
+                formatted_date = moment(result.ngaysinh).format('DD-MM-YYYY, h:mm:ss a');
+            }
+            returnResult = {
+                hoten: result.hoten,
+                email: result.email,
+                ngaysinh: formatted_date,
+                diachi: result.diachi
+            }
+            return res.json(returnResult).status(200).end();
+        }
+    }
+  });
+
 
 module.exports = app;

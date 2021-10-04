@@ -17,6 +17,20 @@ class TaiKhoan extends Model {
         }
         return rows;
     }
+
+    static async findById(id)
+    {
+        const rows = await TaiKhoan.findOne({
+            where :{
+                mataikhoan : id,
+            }
+        })
+        if(rows.length === 0)
+        {
+            return null;
+        }
+        return rows;
+    }
 }
 // chat Table Created Method
 TaiKhoan.init({
