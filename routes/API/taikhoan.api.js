@@ -30,12 +30,25 @@ app.route('/login')
     }else{
         const user = await TaiKhoan.findByMail(body.email);
         console.log(user.hoten);
-        if(user != null)
+        if(user === null)
         {
-            return res.status(204).json(user);
+            return res.status(204).end();
         }
+        
+        if (user.matkhau == body.password) {
+            const userReturned =
+            {
+                mataikhoan: user.mataikhoan,
+                hoten: user.hoten,
+                status: user.activate_status
+            }
+            return res.json(userReturned).status(200).end();
+        }else{
+            return res.status(403).end();
+        }
+
     }
-    return res.status(205).end();
+
 })
 
 

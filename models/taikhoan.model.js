@@ -44,6 +44,9 @@ TaiKhoan.init({
     diachi: {
         type: Sequelize.STRING,
     },
+    activate_status:{
+        type: Sequelize.INTEGER,
+    },
 }, {
     // Other model options go here
     freezeTableName: true,
