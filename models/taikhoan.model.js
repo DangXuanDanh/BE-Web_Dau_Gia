@@ -31,6 +31,18 @@ class TaiKhoan extends Model {
         }
         return rows;
     }
+
+    static patch(id, user_noId)
+    {
+        return TaiKhoan.update(
+            user_noId
+        ,
+            {
+                where: {
+                    mataikhoan: id,
+                },
+            });
+    }
 }
 // chat Table Created Method
 TaiKhoan.init({

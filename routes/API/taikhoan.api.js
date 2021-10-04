@@ -1,4 +1,6 @@
 const express = require('express');
+const moment = require('moment');
+require('moment/locale/vi');
 const app = new express.Router();
 const Sequelize = require('sequelize')
 const { Op } = require('sequelize')
@@ -66,7 +68,7 @@ app.route('/profile/:userId')
             var formatted_date = null;
             if(result.ngaysinh != null)
             {
-                formatted_date = moment(result.ngaysinh).format('DD-MM-YYYY, h:mm:ss a');
+                formatted_date = moment(result.ngaysinh).format('DD-MM-YYYY');
             }
             returnResult = {
                 hoten: result.hoten,
@@ -79,5 +81,29 @@ app.route('/profile/:userId')
     }
   });
 
-
+  app.route('/update')
+  .patch(async (req, res)=> {
+    const body = req.body;
+    /*let temptime = new Date(body.ngaysinh)
+    temptime.toLocaleDateString('en-GB')
+    time = moment(body.ngaysinh).format('DD/MM/YYYY')
+    console.log("Time :" + time);
+    console.log(body.ngaysinh)*/
+    const user = {
+        hoten: body.hoten,
+        email: body.email,
+        ngaysinh: body.ngaysinh,
+        diachi: body.diachi
+    }
+    const id = body.mataikhoan;
+    const result = await TaiKhoan.patch(id,user);
+    console.log(result)
+    if(result == 0)
+    {
+        return res.status(404).end();
+    }else{
+        return res.json(result).status(200).end();
+    }
+    
+  });
 module.exports = app;
