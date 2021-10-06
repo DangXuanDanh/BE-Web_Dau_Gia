@@ -5,6 +5,7 @@ const { Op } = require('sequelize')
 
 const SanPham = require('../../models/sanpham.model');
 const DanhMuc = require('../../models/danhmuc.model');
+const AnhSanPham = require('../../models/anhsanpham.model');
 
 function validate() {
     return async function (req, res, next) {
@@ -27,7 +28,7 @@ app.route('/:id')
         where: {
             masanpham: req.params.id
         },
-        include: DanhMuc
+        include: [DanhMuc, AnhSanPham]
     }));
 })
 .delete(async function (req, res, next) {
