@@ -4,6 +4,9 @@ require('moment/locale/vi');
 const app = new express.Router();
 const Sequelize = require('sequelize')
 const { Op } = require('sequelize')
+const bcrypt = require('bcrypt');
+
+const saltRounds = 10;
 
 const TaiKhoan = require('../../models/taikhoan.model');
 
@@ -36,8 +39,10 @@ app.route('/login')
         {
             return res.status(204).end();
         }
+        const hashed = user.matkhau;
+        var validUser = bcrypt.compareSync(body.password, hashed) 
         
-        if (user.matkhau == body.password) {
+        if (validUser) {
             const userReturned =
             {
                 mataikhoan: user.mataikhoan,
@@ -105,5 +110,40 @@ app.route('/profile/:userId')
         return res.json(result).status(200).end();
     }
     
+  });
+
+  app.route('/change-profile-password')
+  .post(async (req, res)=> {
+    const body = req.body;
+    if(body === null || body === 0)
+    {
+        return res.status(404).end();
+    }
+    else{
+        const user_record = await TaiKhoan.findById(body.mataikhoan);
+        if(user_record === null || user_record === 0)
+        {
+            return res.status(404).end();
+        }
+        else{
+            const user = {
+                matkhau: user_record.matkhau,
+            }
+            const userId = user_record.mataikhoan;
+            var oldPassword = body.oldPassword;
+            const salt = bcrypt.genSaltSync(saltRounds);
+            var newPassword= bcrypt.hashSync(body.newPassword, salt);
+            var validOldPassword = bcrypt.compareSync(oldPassword, user_record.matkhau)
+            if(validOldPassword)
+            {
+                user.matkhau = newPassword;
+                await TaiKhoan.patch(userId,user);
+                return res.status(200).end();
+            } 
+            else{
+                return res.status(400).end();
+            }
+        }
+    }
   });
 module.exports = app;
