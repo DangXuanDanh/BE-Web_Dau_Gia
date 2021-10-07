@@ -26,7 +26,6 @@ app.route('/:id')
         where: {
             madanhmuc: req.params.id
         },
-        include: DanhMuc
     }));
 })
 .delete(async function (req, res, next) {
@@ -38,6 +37,31 @@ app.route('/:id')
     res.status(204).json(actor);
 })
 
+app.route('/danhmuccon/:id')
+.get(async function (req, res) {
+    res.status(200).json(await DanhMuc.findAll({
+        where: {
+            madanhmuccha: req.params.id
+        },
+    }));
+})
+
+app.route('/danhmuccha/get')
+    .all(async function (req, res, next) {
+        next()
+    })
+    .get(async function (req, res, next) {
+        actors = await DanhMuc.findAll({
+            order: [
+                ['madanhmuc', 'DESC']
+            ],
+            where: {
+                madanhmuccha: null
+            }
+        });
+        res.status(200).json(actors);
+    })
+
 app.route('/')
     .all(async function (req, res, next) {
         next()
@@ -46,7 +70,10 @@ app.route('/')
         actors = await DanhMuc.findAll({
             order: [
                 ['madanhmuc', 'DESC']
-            ]
+            ],
+            where: {
+                madanhmuccha: {[Op.ne]: null}
+            }
         });
         res.status(200).json(actors);
     })

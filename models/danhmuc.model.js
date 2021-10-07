@@ -22,6 +22,9 @@ DanhMuc.init({
     tendanhmuc: {
         type: Sequelize.STRING,
     },
+    madanhmuccha: {
+        type: Sequelize.INTEGER,
+    },
 }, {
     // Other model options go here
     freezeTableName: true,
