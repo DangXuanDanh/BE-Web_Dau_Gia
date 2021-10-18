@@ -73,6 +73,12 @@ TaiKhoan.init({
     activate_status:{
         type: Sequelize.INTEGER,
     },
+    danhgiatot:{
+        type: Sequelize.INTEGER,
+    },
+    danhgiaxau:{
+        type: Sequelize.INTEGER,
+    },
 }, {
     // Other model options go here
     freezeTableName: true,

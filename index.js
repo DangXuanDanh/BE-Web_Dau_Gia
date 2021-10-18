@@ -36,7 +36,6 @@ const AnhSanPham = require('./models/anhsanpham.model');
 
 app.listen(PORT, async function () {
     console.log(`Server is running at http://localhost:${PORT}`);
-
     db.sync({ alter: process.env.DB_SYNC == 'true' }).then(() => {
         console.log(`db connected success`);
     }).catch(function (error) {
