@@ -24,12 +24,17 @@ function validate() {
 
 app.route('/:id')
 .get(async function (req, res) {
-    res.status(200).json(await SanPham.findOne({
+    let sp = await SanPham.findOne({
         where: {
             masanpham: req.params.id
         },
+        // raw: true,
+        // nest: true,
         include: [DanhMuc, AnhSanPham]
-    }));
+    })
+    sp = sp.toJSON()
+    sp.thoigian = sp.ngayketthuc - new Date()
+    res.status(200).json(sp);
 })
 .delete(async function (req, res, next) {
     actor = await SanPham.destroy({
