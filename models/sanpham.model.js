@@ -11,6 +11,16 @@ class SanPham extends Model {
             }
         });
     }
+    static async selectRawQuery(query,replace) {
+        return SanPham.sequelize.query(query,
+            {
+                replacements: replace,
+                type: Sequelize.SELECT,
+                model: SanPham,
+                mapToModel: true
+            } 
+        );
+    }
 }
 // chat Table Created Method
 SanPham.init({

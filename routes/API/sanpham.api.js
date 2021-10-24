@@ -97,7 +97,37 @@ app.route('/')
             });
         res.json(actor);
     })
-
-
-
+//5 San pham co gia cao nhat
+app.route('/get/MaxPrice').get(async function (req, res) {
+        console.log("GET START");
+        let sp = await SanPham.selectRawQuery('SELECT * FROM sanpham order by giakhoidiem desc LIMIT :limit',{ limit: 5 })
+        console.log(sp);
+        res.status(200).json(sp);
+}) 
+//5 San pham gan ket thuc    
+app.route('/get/NearEnd').get(async function (req, res) {
+    let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
+    WHERE (interval '0 days')<=age(ngayketthuc,CURRENT_TIMESTAMP) and age(ngayketthuc,CURRENT_TIMESTAMP)<=(interval '3 days')
+    LIMIT :limit`,{ limit: 5 })
+    res.status(200).json(sp);
+})
+//5 San pham luot ra gia cao nhat
+app.route('/get/NearEnd').get(async function (req, res) {
+    let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
+    WHERE (interval '0 days')<=age(ngayketthuc,CURRENT_TIMESTAMP) and age(ngayketthuc,CURRENT_TIMESTAMP)<=(interval '3 days')
+    LIMIT :limit`,{ limit: 5 })
+    res.status(200).json(sp);
+})       
+app.route('/get/Count').get(async function (req, res) {
+    let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
+    WHERE (interval '0 days')<=age(ngayketthuc,CURRENT_TIMESTAMP) and age(ngayketthuc,CURRENT_TIMESTAMP)<=(interval '3 days')
+    LIMIT :limit`,{ limit: 5 })
+    res.status(200).json(sp);
+})   
+// Lay san pham theo danh muc
+app.route('/get/category/:id').get(async function (req, res) {
+    let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
+    WHERE madanhmuc=:id`,{ id: req.params.id })
+    res.status(200).json(sp);
+}) 
 module.exports = app;
