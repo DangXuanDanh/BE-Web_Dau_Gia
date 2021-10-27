@@ -42,8 +42,8 @@ SanPham.init({
     madanhmuc: {
         type: Sequelize.INTEGER,
     },
-    maanhdaidien: {
-        type: Sequelize.INTEGER,
+    anhdaidien: {
+        type: Sequelize.STRING,
     },
     giakhoidiem: {
         type: Sequelize.DECIMAL,

@@ -83,7 +83,7 @@ app.route('/')
             tensanpham: req.body.tensanpham,
             mota: req.body.mota,
             madanhmuc: req.body.madanhmuc,
-            maanhdaidien: req.body.maanhdaidien,
+            anhdaidien: req.body.anhdaidien,
             giakhoidiem: req.body.giakhoidiem,
             giamuangay: req.body.giamuangay,
             buocgia: req.body.buocgia,

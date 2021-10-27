@@ -32,7 +32,7 @@ app.use('/API/sanpham', require('./routes/API/sanpham.api'))
 app.use('/API/lichsudaugia', require('./routes/API/lichsudaugia.api'))
 app.use('/API/user', require('./routes/API/taikhoan.api'))
 app.use('/API/danhmuc', require('./routes/API/danhmuc.api'))
-const AnhSanPham = require('./models/anhsanpham.model');
+app.use('/API/anhsanpham', require('./routes/API/anhsanpham.api'))
 
 app.listen(PORT, async function () {
     console.log(`Server is running at http://localhost:${PORT}`);
