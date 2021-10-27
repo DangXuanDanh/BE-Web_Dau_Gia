@@ -4,44 +4,46 @@ const tableName = 'taikhoan';
 const Model = Sequelize.Model
 
 class TaiKhoan extends Model {
-  
+
     static async findByMail(email) {
         const rows = await TaiKhoan.findOne({
-            where :{
+            where: {
                 email,
             }
         })
-        if(rows.length === 0)
-        {
+        if (rows.length === 0) {
             return null;
         }
         return rows;
     }
 
-    static async findById(id)
-    {
+    static async findById(id) {
         const rows = await TaiKhoan.findOne({
-            where :{
-                mataikhoan : id,
+            where: {
+                mataikhoan: id,
             }
         })
-        if(rows.length === 0)
-        {
+        if (rows.length === 0) {
             return null;
         }
         return rows;
     }
 
-    static patch(id, user_noId)
-    {
+    static patch(id, user_noId) {
         return TaiKhoan.update(
-            user_noId
-        ,
-            {
+            user_noId, {
                 where: {
                     mataikhoan: id,
                 },
             });
+    }
+
+    static delete(id) {
+        return TaiKhoan.destroy({
+            where: {
+                mataikhoan: id,
+            },
+        });
     }
 }
 // chat Table Created Method
@@ -64,19 +66,19 @@ TaiKhoan.init({
     matkhau: {
         type: Sequelize.STRING,
     },
-    ngaysinh:{
+    ngaysinh: {
         type: 'TIMESTAMP',
     },
     diachi: {
         type: Sequelize.STRING,
     },
-    activate_status:{
+    activate_status: {
         type: Sequelize.INTEGER,
     },
-    danhgiatot:{
+    danhgiatot: {
         type: Sequelize.INTEGER,
     },
-    danhgiaxau:{
+    danhgiaxau: {
         type: Sequelize.INTEGER,
     },
 }, {
