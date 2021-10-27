@@ -25,6 +25,12 @@ function validate() {
     }
 }
 
+app.route('/alluser')
+.get(async function(req,res){
+    const user = await TaiKhoan.findAll();
+    return res.json(user).status(200).end();
+})
+
 app.route('/login')
 .post(async function (req, res) {
     const body = req.body;
