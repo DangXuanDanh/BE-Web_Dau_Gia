@@ -71,16 +71,41 @@ app.route('/profile/:userId')
             if (result === 0 || result === null) {
                 return res.status(404).end();
             } else {
+                returnResult = {
+                    hoten: result.hoten,
+                    email: result.email,
+                    ngaysinh: result.ngaysinh,
+                    diachi: result.diachi
+                }
+                return res.json(returnResult).status(200).end();
+            }
+        }
+    });
+
+    app.route('/profileuser/:userId')
+    .get(async(req, res) => {
+        const id = req.params.userId || 0;
+        if (id === 0 || id === null) {
+            return res.status(404).end();
+        } else {
+            var result = await TaiKhoan.findById(id);
+            if (result === 0 || result === null) {
+                return res.status(404).end();
+            } else {
                 var formatted_date = null;
                 if (result.ngaysinh != null) {
                     formatted_date = moment(result.ngaysinh).format('DD-MM-YYYY');
                 }
                 returnResult = {
+                    id: result.mataikhoan,
                     hoten: result.hoten,
                     email: result.email,
                     ngaysinh: formatted_date,
-                    diachi: result.diachi
-                }
+                    diachi: result.diachi,
+                    activate_status: result.activate_status,
+                    danhgiatot: result.danhgiatot,
+                    danhgiaxau: result.danhgiaxau
+                    }
                 return res.json(returnResult).status(200).end();
             }
         }
