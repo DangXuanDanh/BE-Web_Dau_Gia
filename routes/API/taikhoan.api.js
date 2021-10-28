@@ -75,7 +75,9 @@ app.route('/profile/:userId')
                     hoten: result.hoten,
                     email: result.email,
                     ngaysinh: result.ngaysinh,
-                    diachi: result.diachi
+                    diachi: result.diachi,
+                    danhgiatot: result.danhgiatot,
+                    danhgiaxau: result.danhgiaxau
                 }
                 return res.json(returnResult).status(200).end();
             }
@@ -84,7 +86,7 @@ app.route('/profile/:userId')
 
     app.route('/profileuser/:userId')
     .get(async(req, res) => {
-        const id = req.params.userId || 0;
+        const id = +req.params.userId || 0;
         if (id === 0 || id === null) {
             return res.status(404).end();
         } else {
