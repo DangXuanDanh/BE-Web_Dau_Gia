@@ -182,6 +182,24 @@ app.route('/upgrade/:userId')
         }
     })
 
+    app.route('/degrade/:userId')
+    .patch(async (req, res) => {
+        const id = +req.params.userId || 0;
+        /*let temptime = new Date(body.ngaysinh)
+        temptime.toLocaleDateString('en-GB')
+        time = moment(body.ngaysinh).format('DD/MM/YYYY')
+        console.log("Time :" + time);
+        console.log(body.ngaysinh)*/
+        const user = {
+            role: 1,
+        }
+        const result = await TaiKhoan.patch(id, user);
+        if (result == 0) {
+            return res.status(404).end();
+        } else {
+            return res.json(result).status(200).end();
+        }
+    })
 app.route('/change-profile-password')
     .post(async (req, res) => {
         const body = req.body;
