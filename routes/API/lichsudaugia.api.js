@@ -51,7 +51,7 @@ app.route('/sanpham/:id')
             order: [
                 ['ngaydaugia', 'DESC']
             ],
-            limit: 5 ,
+            limit: 5,
             where: {
                 masanpham: req.params.id
             }
@@ -81,9 +81,8 @@ app.route('/')
         let noidung = 'Thành công'
         let tongdanhgia = user.danhgiatot + user.danhgiaxau
         let bool = tongdanhgia == 0
-        let ratio = tongdanhgia > 0 ? user.danhgiatot/tongdanhgia : -1
-        if (bool == false)
-        {
+        let ratio = tongdanhgia > 0 ? user.danhgiatot / tongdanhgia : -1
+        if (bool == false) {
             bool = ratio >= 0.8 ? true : false
             noidung = bool ? noidung : 'Không đủ điểm đánh giá'
         }
@@ -92,34 +91,78 @@ app.route('/')
             order: [
                 ['ngaydaugia', 'DESC']
             ],
-            limit: 1 ,
+            limit: 1,
             where: {
                 masanpham: req.body.masanpham
             }
         });
-
+        let giadat = req.body.gia
         let bool2 = true
-        if (sanpham != undefined)
-        {
-            if (parseInt(req.body.gia) < sanpham.gia){
+        let bool3 = true
+        if (sanpham != undefined) {
+            if (parseInt(req.body.gia) < sanpham.gia) {
                 bool2 = false
             }
-        } 
-        noidung = bool2 ? noidung : 'Giá cược không hợp lệ ' +req.body.gia+' < '+sanpham.gia
+
+
+            if (!sanpham.giacaonhat) {
+                giadat = sanpham.giakhoidiem
+            } else {
+                if (parseInt(req.body.gia) <= sanpham.giacaonhat) {
+                    bool3 = false
+                    customer = await LichSuDauGia.create({
+                        masanpham: req.body.masanpham,
+                        mataikhoan: sanpham.mataikhoan,
+                        gia: req.body.gia,
+                        giacaonhat: sanpham.giacaonhat,
+                    }).then(async (e) => {
+                        actor = await SanPham.update({
+                            malichsucaonhat: e.malichsudaugia
+                        },
+                            {
+                                where: {
+                                    masanpham: req.body.masanpham,
+                                },
+                            })
+                    })
+                }
+                else {
+                    const thongtinsanpham = await SanPham.findOne({
+                        where: {
+                            masanpham: req.body.masanpham
+                        }
+                    }).then((e)=>{
+                        giadat = parseInt(sanpham.giacaonhat) + parseInt(e.buocgia)
+                    })
+                }
+            }
+
+        }
+        noidung = bool2 ? noidung : 'Giá cược không hợp lệ ' + req.body.gia + ' < ' + sanpham.gia
+        noidung = bool3 ? noidung : 'Cược không thành công, người khác đã đặt giá cao hơn'
 
         const result = {
-            danhgia : ratio,
-            status: bool && bool2,
+            danhgia: ratio,
+            status: bool && bool2 && bool3,
             messenger: noidung
         }
 
-        if (bool && bool2)
-        {
+        if (bool && bool2 && bool3) {
+            console.log("dau gia thanh cong ")
             customer = await LichSuDauGia.create({
                 masanpham: req.body.masanpham,
                 mataikhoan: req.body.mataikhoan,
-                gia: req.body.gia,
+                gia: giadat,
+                giacaonhat: req.body.gia,
             });
+            actor = await SanPham.update({
+                malichsucaonhat: customer.malichsudaugia
+            },
+                {
+                    where: {
+                        masanpham: req.body.masanpham,
+                    },
+                });
         }
         res.status(200).json(result);
     })

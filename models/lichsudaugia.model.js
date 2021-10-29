@@ -28,6 +28,9 @@ LichSuDauGia.init({
     gia: {
         type: Sequelize.DECIMAL,
     },
+    giacaonhat: {
+        type: Sequelize.DECIMAL,
+    },
     ngaydaugia:{
         type: 'TIMESTAMP',
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
