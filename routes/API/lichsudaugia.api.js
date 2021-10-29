@@ -5,6 +5,8 @@ const LichSuDauGia = require('../../models/lichsudaugia.model');
 const SanPham = require('../../models/sanpham.model');
 const TaiKhoan = require('../../models/taikhoan.model');
 
+const Email = require('../../services/mailer');
+
 function validate() {
     return async function (req, res, next) {
         // const customer = {
@@ -124,6 +126,10 @@ app.route('/')
                                     masanpham: req.body.masanpham,
                                 },
                             })
+                            console.log("zxcxczxczxcz")
+                            console.log("zxcxczxczxcz")
+                            console.log("zxcxczxczxcz")
+                            await Email.send(user.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL||'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
                     })
                 }
                 else {
