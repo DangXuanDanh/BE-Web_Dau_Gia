@@ -29,6 +29,19 @@ class TaiKhoan extends Model {
         return rows;
     }
 
+    static async findByActivate_upgrade(activate_upgrade) {
+        const rows = await TaiKhoan.findAll({
+            where: {
+                activate_upgrade: activate_upgrade,
+                role : 1
+            }
+        })
+        if (rows.length === 0) {
+            return null;
+        }
+        return rows;
+    }
+
     static patch(id, user_noId) {
         return TaiKhoan.update(
             user_noId, {
@@ -79,6 +92,12 @@ TaiKhoan.init({
         type: Sequelize.INTEGER,
     },
     danhgiaxau: {
+        type: Sequelize.INTEGER,
+    },
+    role:{
+        type: Sequelize.INTEGER,
+    },
+    activate_upgrade:{
         type: Sequelize.INTEGER,
     },
 }, {
