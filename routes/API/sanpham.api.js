@@ -57,7 +57,8 @@ app.route('/')
             where:{
                 ngayketthuc: {
                     [Op.gte]: Sequelize.literal('CURRENT_TIMESTAMP')
-                  }
+                  },
+                is_delete : 0
             }
         });
         res.status(200).json(actors);
@@ -88,7 +89,8 @@ app.route('/')
             giamuangay: req.body.giamuangay,
             buocgia: req.body.buocgia,
             tudonggiahan: req.body.tudonggiahan,
-            ngayketthuc: req.body.ngayketthuc
+            ngayketthuc: req.body.ngayketthuc,
+            is_delete: req.body.is_delete
         },
             {
                 where: {

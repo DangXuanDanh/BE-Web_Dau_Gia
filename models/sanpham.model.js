@@ -69,6 +69,9 @@ SanPham.init({
     ngayketthuc: {
         type: 'TIMESTAMP',
     },
+    is_delete: {
+        type: Sequelize.INTEGER,
+    },
 }, {
     // Other model options go here
     freezeTableName: true,
