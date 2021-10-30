@@ -85,8 +85,10 @@ app.route('/profile/:userId')
                     email: result.email,
                     ngaysinh: result.ngaysinh,
                     diachi: result.diachi,
+                    role : result.role,
                     danhgiatot: result.danhgiatot,
-                    danhgiaxau: result.danhgiaxau
+                    danhgiaxau: result.danhgiaxau,
+                    activate_upgrade: result.activate_upgrade
                 }
                 return res.json(returnResult).status(200).end();
             }
@@ -148,7 +150,8 @@ app.route('/update')
             hoten: body.hoten,
             email: body.email,
             ngaysinh: body.ngaysinh,
-            diachi: body.diachi
+            diachi: body.diachi,
+            activate_upgrade: body.activate_upgrade
         }
         const id = body.mataikhoan;
         const result = await TaiKhoan.patch(id, user);
