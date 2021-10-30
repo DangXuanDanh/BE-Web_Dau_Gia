@@ -3,6 +3,8 @@ const app = new express.Router();
 
 const LichSuDauGia = require('../../models/lichsudaugia.model');
 const SanPham = require('../../models/sanpham.model');
+const DanhMuc = require('../../models/danhmuc.model');
+const AnhSanPham = require('../../models/anhsanpham.model');
 const TaiKhoan = require('../../models/taikhoan.model');
 
 const Email = require('../../services/mailer');
@@ -126,10 +128,21 @@ app.route('/')
                                     masanpham: req.body.masanpham,
                                 },
                             })
-                            console.log("zxcxczxczxcz")
-                            console.log("zxcxczxczxcz")
-                            console.log("zxcxczxczxcz")
-                            await Email.send(user.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL||'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+                        const thongtinsanpham = await SanPham.findOne({
+                            where: {
+                                masanpham: req.body.masanpham
+                            },
+                            include: [DanhMuc, AnhSanPham, TaiKhoan]
+                        }).then(async (e) => {
+                            await Email.send(e.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+                            const abc = await TaiKhoan.findOne({
+                                where: {
+                                    mataikhoan: sanpham.mataikhoan
+                                }
+                            }).then(async (e) => {
+                                await Email.send(e.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+                            })
+                        })
                     })
                 }
                 else {
@@ -137,7 +150,7 @@ app.route('/')
                         where: {
                             masanpham: req.body.masanpham
                         }
-                    }).then((e)=>{
+                    }).then((e) => {
                         giadat = parseInt(sanpham.giacaonhat) + parseInt(e.buocgia)
                     })
                 }
@@ -169,7 +182,27 @@ app.route('/')
                         masanpham: req.body.masanpham,
                     },
                 });
-        await Email.send(user.email, 'Bạn đã đấu giá thành công!', `Vào ${process.env.BASE_URL||'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+            const thongtinsanpham = await SanPham.findOne({
+                where: {
+                    masanpham: req.body.masanpham
+                },
+                include: [DanhMuc, AnhSanPham, TaiKhoan]
+            }).then(async (e) => {
+                await Email.send(e.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+                await Email.send(user.email, 'Bạn đã đấu giá thành công!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+
+                if (sanpham != undefined) {
+                    await TaiKhoan.findOne({
+                        where: {
+                            mataikhoan: sanpham.mataikhoan
+                        }
+                    }).then(async (e) => {
+                        if (e.email != user.email){
+                            await Email.send(e.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+                        }
+                    })
+                }
+            })
 
         }
         res.status(200).json(result);

@@ -6,6 +6,7 @@ const { Op } = require('sequelize')
 const SanPham = require('../../models/sanpham.model');
 const DanhMuc = require('../../models/danhmuc.model');
 const AnhSanPham = require('../../models/anhsanpham.model');
+const TaiKhoan = require('../../models/taikhoan.model');
 
 function validate() {
     return async function (req, res, next) {
@@ -30,7 +31,7 @@ app.route('/:id')
         },
         // raw: true,
         // nest: true,
-        include: [DanhMuc, AnhSanPham]
+        include: [DanhMuc, AnhSanPham, TaiKhoan]
     })
     sp = sp.toJSON()
     sp.thoigian = sp.ngayketthuc - new Date()
