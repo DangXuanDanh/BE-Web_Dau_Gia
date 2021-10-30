@@ -74,7 +74,8 @@ app.route('/')
             giamuangay: req.body.giamuangay,
             buocgia: req.body.buocgia,
             tudonggiahan: req.body.tudonggiahan,
-            ngayketthuc: req.body.ngayketthuc
+            ngayketthuc: req.body.ngayketthuc,
+            manguoidang: req.body.manguoidang
         });
         res.status(200).json(actor);
     })

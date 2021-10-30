@@ -169,6 +169,8 @@ app.route('/')
                         masanpham: req.body.masanpham,
                     },
                 });
+        await Email.send(user.email, 'Bạn đã đấu giá thành công!', `Vào ${process.env.BASE_URL||'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+
         }
         res.status(200).json(result);
     })

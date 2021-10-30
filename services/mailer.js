@@ -6,13 +6,18 @@ async function send(to, subject, content){
         port: 587,
         secure: false,
         auth:{
-            user: 'hotlinescambank@gmail.com',
-            pass: 'scammymoney123',
-        }
+            user: "webhiendaihcb02@gmail.com",
+            pass: "a0943361873",
+        },
+        // tls: {
+        //     // do not fail on invalid certs
+        //     rejectUnauthorized: false,
+        //   },
+        requireTLS: true,
     });
     
     return transporter.sendMail({
-        from: 'hotlinescambank@gmail.com',
+        from: "daugiatudong@gmail.com",
         to,
         subject,
         text: content,
