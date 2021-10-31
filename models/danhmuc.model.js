@@ -25,6 +25,9 @@ DanhMuc.init({
     madanhmuccha: {
         type: Sequelize.INTEGER,
     },
+    is_deleted: {
+        type: Sequelize.INTEGER,
+    },
 }, {
     // Other model options go here
     freezeTableName: true,
