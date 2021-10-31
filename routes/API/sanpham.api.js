@@ -121,14 +121,7 @@ app.route('/get/NearEnd').get(async function (req, res) {
     WHERE (interval '0 days')<=age(ngayketthuc,CURRENT_TIMESTAMP) and age(ngayketthuc,CURRENT_TIMESTAMP)<=(interval '3 days')
     LIMIT :limit`,{ limit: 5 })
     res.status(200).json(sp);
-})
-//5 San pham luot ra gia cao nhat
-app.route('/get/NearEnd').get(async function (req, res) {
-    let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
-    WHERE (interval '0 days')<=age(ngayketthuc,CURRENT_TIMESTAMP) and age(ngayketthuc,CURRENT_TIMESTAMP)<=(interval '3 days')
-    LIMIT :limit`,{ limit: 5 })
-    res.status(200).json(sp);
-})       
+})     
 app.route('/get/Count').get(async function (req, res) {
     let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
     WHERE (interval '0 days')<=age(ngayketthuc,CURRENT_TIMESTAMP) and age(ngayketthuc,CURRENT_TIMESTAMP)<=(interval '3 days')
