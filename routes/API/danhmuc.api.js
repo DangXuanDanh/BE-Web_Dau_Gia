@@ -96,6 +96,38 @@ app.route('/')
         res.json(actor);
     })
 
+app.route('/admin')
+    .all(async function (req, res, next) {
+        next()
+    })
+    .get(async function (req, res, next) {
+        actors = await DanhMuc.findAll({
+            order: [
+                ['madanhmuc', 'DESC']
+            ],
+            where: {
+                madanhmuccha: {[Op.ne]: null}
+            }
+        });
+        res.status(200).json(actors);
+    })
+    .post(validate(),async function (req, res, next) {
 
+        actor = await DanhMuc.create({
+            tendanhmuc: req.body.tendanhmuc,
+        });
+        res.status(200).json(actor);
+    })
+    .put(validate(),async function (req, res, next) {
+        actor = await DanhMuc.update({
+            tendanhmuc: req.body.tendanhmuc,
+        },
+            {
+                where: {
+                    madanhmuc: req.body.madanhmuc,
+                },
+            });
+        res.json(actor);
+    })
 
 module.exports = app;
