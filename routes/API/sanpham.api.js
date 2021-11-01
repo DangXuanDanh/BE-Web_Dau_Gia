@@ -115,6 +115,13 @@ app.route('/get/New').get(async function (req, res) {
     console.log(sp);
     res.status(200).json(sp);
 }) 
+
+//5 San pham moi nhat cung danh muc
+app.route('/get/New/:sanpham/:danhmuc').get(async function (req, res) {
+    let sp = await SanPham.selectRawQuery('SELECT * FROM sanpham where masanpham != :sanpham and madanhmuc = :danhmuc order by ngaydang desc LIMIT :limit',{ limit: 5, sanpham:req.params.sanpham, danhmuc:req.params.danhmuc })
+    res.status(200).json(sp);
+}) 
+
 //5 San pham gan ket thuc    
 app.route('/get/NearEnd').get(async function (req, res) {
     let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
