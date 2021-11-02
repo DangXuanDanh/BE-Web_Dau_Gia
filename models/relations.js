@@ -8,6 +8,9 @@ const TaiKhoan = require('./taikhoan.model');
 SanPham.hasMany(LichSuDauGia)
 LichSuDauGia.belongsTo(SanPham,{foreignKey: 'masanpham'})
 
+TaiKhoan.hasMany(LichSuDauGia)
+LichSuDauGia.belongsTo(TaiKhoan,{foreignKey: 'mataikhoan'})
+
 SanPham.hasMany(AnhSanPham)
 AnhSanPham.belongsTo(SanPham,{foreignKey: 'masanpham'})
 

@@ -34,7 +34,8 @@ app.route('/:id')
         res.status(200).json(await LichSuDauGia.findOne({
             where: {
                 malichsudaugia: req.params.id
-            }
+            },
+            include: [TaiKhoan]
         }));
     })
     .delete(async function (req, res, next) {
@@ -58,7 +59,8 @@ app.route('/sanpham/:id')
             limit: 5,
             where: {
                 masanpham: req.params.id
-            }
+            },
+            include: [TaiKhoan]
         });
         res.status(200).json(customers);
     })
@@ -72,6 +74,7 @@ app.route('/')
             order: [
                 ['ngaydaugia', 'DESC']
             ],
+            include: [TaiKhoan]
             // include: SanPham
         });
         res.status(200).json(customers);

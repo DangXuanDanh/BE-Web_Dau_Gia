@@ -28,6 +28,18 @@ app.route('/:id')
         },
     }));
 })
+.put(validate(),async function (req, res, next) {
+    actor = await DanhMuc.update({
+        tendanhmuc: req.body.tendanhmuc,
+        is_deleted: req.body.is_deleted,
+    },
+        {
+            where: {
+                madanhmuc: req.params.id
+            },
+        });
+    res.json(actor);
+})
 .delete(async function (req, res, next) {
     actor = await DanhMuc.destroy({
         where: {
@@ -41,7 +53,8 @@ app.route('/danhmuccon/:id')
 .get(async function (req, res) {
     res.status(200).json(await DanhMuc.findAll({
         where: {
-            madanhmuccha: req.params.id
+            madanhmuccha: req.params.id,
+            is_deleted : 0
         },
     }));
 })
@@ -56,7 +69,8 @@ app.route('/danhmuccha/get')
                 ['madanhmuc', 'DESC']
             ],
             where: {
-                madanhmuccha: null
+                madanhmuccha: null,
+                is_deleted : 0
             }
         });
         res.status(200).json(actors);
@@ -72,7 +86,8 @@ app.route('/')
                 ['madanhmuc', 'DESC']
             ],
             where: {
-                madanhmuccha: {[Op.ne]: null}
+                madanhmuccha: {[Op.ne]: null},
+                is_deleted : 0
             }
         });
         res.status(200).json(actors);
@@ -81,40 +96,7 @@ app.route('/')
 
         actor = await DanhMuc.create({
             tendanhmuc: req.body.tendanhmuc,
-        });
-        res.status(200).json(actor);
-    })
-    .put(validate(),async function (req, res, next) {
-        actor = await DanhMuc.update({
-            tendanhmuc: req.body.tendanhmuc,
-        },
-            {
-                where: {
-                    madanhmuc: req.body.madanhmuc,
-                },
-            });
-        res.json(actor);
-    })
-
-app.route('/admin')
-    .all(async function (req, res, next) {
-        next()
-    })
-    .get(async function (req, res, next) {
-        actors = await DanhMuc.findAll({
-            order: [
-                ['madanhmuc', 'DESC']
-            ],
-            where: {
-                madanhmuccha: {[Op.ne]: null}
-            }
-        });
-        res.status(200).json(actors);
-    })
-    .post(validate(),async function (req, res, next) {
-
-        actor = await DanhMuc.create({
-            tendanhmuc: req.body.tendanhmuc,
+            madanhmuccha: req.body.madanhmuccha,
         });
         res.status(200).json(actor);
     })
