@@ -103,14 +103,12 @@ app.route('/')
     })
 //5 San pham co gia cao nhat
 app.route('/get/MaxPrice').get(async function (req, res) {
-        console.log("GET START");
-        let sp = await SanPham.selectRawQuery('SELECT * FROM sanpham order by giakhoidiem desc LIMIT :limit',{ limit: 5 })
+        let sp = await SanPham.selectRawQuery('SELECT * FROM sanpham order by giamuangay desc LIMIT :limit',{ limit: 5 })
         console.log(sp);
         res.status(200).json(sp);
 }) 
 //5 San pham moi nhat
 app.route('/get/New').get(async function (req, res) {
-    console.log("GET START");
     let sp = await SanPham.selectRawQuery('SELECT * FROM sanpham order by ngaydang desc LIMIT :limit',{ limit: 5 })
     console.log(sp);
     res.status(200).json(sp);
