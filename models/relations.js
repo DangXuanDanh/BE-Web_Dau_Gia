@@ -20,7 +20,6 @@ SanPham.belongsTo(DanhMuc,{foreignKey: 'madanhmuc'})
 TaiKhoan.hasMany(SanPham)
 SanPham.belongsTo(TaiKhoan,{foreignKey: 'manguoidang'})
 
-
 // DanhMuc.hasMany(DanhMuc)
 // DanhMuc.belongsTo(DanhMuc,{foreignKey: 'madanhmuccha'})
 
