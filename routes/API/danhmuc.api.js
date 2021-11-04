@@ -76,6 +76,22 @@ app.route('/danhmuccha/get')
         res.status(200).json(actors);
     })
 
+    app.route('/all/get')
+    .all(async function (req, res, next) {
+        next()
+    })
+    .get(async function (req, res, next) {
+        actors = await DanhMuc.findAll({
+            order: [
+                ['madanhmuc', 'DESC']
+            ],
+            where: {
+                is_deleted : 0
+            }
+        });
+        res.status(200).json(actors);
+    })
+
 app.route('/')
     .all(async function (req, res, next) {
         next()

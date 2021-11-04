@@ -122,7 +122,7 @@ app.route('/get/New/:sanpham/:danhmuc').get(async function (req, res) {
 
 //5 San pham moi nhat cung danh muc cha va con
 app.route('/get/New/:danhmuc').get(async function (req, res) {
-    let sp = await SanPham.selectRawQuery('SELECT * FROM sanpham s join danhmuc d on s.madanhmuc = d.madanhmuc where d.madanhmuc = :danhmuc order by ngaydang desc LIMIT :limit',{ limit: 5, sanpham:req.params.sanpham, danhmuc:req.params.danhmuc })
+    let sp = await SanPham.selectRawQuery('SELECT * FROM sanpham s join danhmuc d on s.madanhmuc = d.madanhmuc where d.madanhmuc = :danhmuc or d.madanhmuccha = :danhmuc order by ngaydang desc LIMIT :limit',{ limit: 5, danhmuc:req.params.danhmuc })
     res.status(200).json(sp);
 }) 
 
