@@ -136,7 +136,7 @@ app.route('/get/NearEnd').get(async function (req, res) {
  
 app.route('/get/Count').get(async function (req, res) {
     let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
-    order by luotragia desc
+    order by luot_ra_gia_hien_tai desc
     LIMIT :limit`,{ limit: 5 })
     res.status(200).json(sp);
 })   
