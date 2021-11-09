@@ -75,6 +75,9 @@ SanPham.init({
     is_delete: {
         type: Sequelize.INTEGER,
     },
+    luot_ra_gia_hien_tai: {
+        type: Sequelize.INTEGER,
+    },
 }, {
     // Other model options go here
     freezeTableName: true,
