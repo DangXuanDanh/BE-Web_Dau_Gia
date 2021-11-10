@@ -45,8 +45,17 @@ app.route('/login')
         if (body.email == null || body.password == null) {
             return res.status(403).end();
         } else {
+            var email = body.email;
+            var datetemp = new Date();
             const user = await TaiKhoan.findByMail(body.email);
-            console.log(user.hoten);
+           if (user.exp_seller <= datetemp) {
+                const userdetal = {
+                    role: 1,
+                }
+                const result = await TaiKhoan.patch(user.mataikhoan, userdetal);
+                user.role = 1;
+            }
+            
             if (user === null) {
                 return res.status(204).end();
             }
@@ -59,7 +68,8 @@ app.route('/login')
                     hoten: user.hoten,
                     status: user.activate_status,
                     role: user.role,
-                    activate_upgrade: user.activate_upgrade
+                    activate_upgrade: user.activate_upgrade,
+                    exp_seller: user.exp_seller
                 }
                 return res.json(userReturned).status(200).end();
             } else {
@@ -151,7 +161,10 @@ app.route('/update')
             email: body.email,
             ngaysinh: body.ngaysinh,
             diachi: body.diachi,
-            activate_upgrade: body.activate_upgrade
+            activate_upgrade: body.activate_upgrade,
+            role: body.role,
+            activate_upgrade : body.activate_upgrade,
+            exp_seller: body.exp_seller
         }
         const id = body.mataikhoan;
         const result = await TaiKhoan.patch(id, user);
@@ -168,6 +181,7 @@ app.route('/update')
 app.route('/upgrade/:userId')
     .patch(async (req, res) => {
         const id = +req.params.userId || 0;
+        const body = req.body;
         /*let temptime = new Date(body.ngaysinh)
         temptime.toLocaleDateString('en-GB')
         time = moment(body.ngaysinh).format('DD/MM/YYYY')
@@ -175,7 +189,8 @@ app.route('/upgrade/:userId')
         console.log(body.ngaysinh)*/
         const user = {
             role: 2,
-            activate_upgrade : 0
+            activate_upgrade : 0,
+            exp_seller: body.exp_seller
         }
         const result = await TaiKhoan.patch(id, user);
         if (result == 0) {

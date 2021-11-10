@@ -100,6 +100,9 @@ TaiKhoan.init({
     activate_upgrade:{
         type: Sequelize.INTEGER,
     },
+    exp_seller:{
+        type: 'TIMESTAMP',
+    },
 }, {
     // Other model options go here
     freezeTableName: true,
