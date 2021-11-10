@@ -48,14 +48,14 @@ app.route('/login')
             var email = body.email;
             var datetemp = new Date();
             const user = await TaiKhoan.findByMail(body.email);
-           if (user.exp_seller <= datetemp) {
+            if (user.exp_seller <= datetemp) {
                 const userdetal = {
                     role: 1,
                 }
                 const result = await TaiKhoan.patch(user.mataikhoan, userdetal);
                 user.role = 1;
             }
-            
+
             if (user === null) {
                 return res.status(204).end();
             }
@@ -95,7 +95,7 @@ app.route('/profile/:userId')
                     email: result.email,
                     ngaysinh: result.ngaysinh,
                     diachi: result.diachi,
-                    role : result.role,
+                    role: result.role,
                     danhgiatot: result.danhgiatot,
                     danhgiaxau: result.danhgiaxau,
                     activate_upgrade: result.activate_upgrade
@@ -163,7 +163,7 @@ app.route('/update')
             diachi: body.diachi,
             activate_upgrade: body.activate_upgrade,
             role: body.role,
-            activate_upgrade : body.activate_upgrade,
+            activate_upgrade: body.activate_upgrade,
             exp_seller: body.exp_seller
         }
         const id = body.mataikhoan;
@@ -189,7 +189,7 @@ app.route('/upgrade/:userId')
         console.log(body.ngaysinh)*/
         const user = {
             role: 2,
-            activate_upgrade : 0,
+            activate_upgrade: 0,
             exp_seller: body.exp_seller
         }
         const result = await TaiKhoan.patch(id, user);
@@ -200,7 +200,7 @@ app.route('/upgrade/:userId')
         }
     })
 
-    app.route('/degrade/:userId')
+app.route('/degrade/:userId')
     .patch(async (req, res) => {
         const id = +req.params.userId || 0;
         /*let temptime = new Date(body.ngaysinh)
@@ -246,4 +246,5 @@ app.route('/change-profile-password')
             }
         }
     });
+
 module.exports = app;
