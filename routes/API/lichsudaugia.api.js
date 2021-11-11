@@ -103,41 +103,107 @@ app.route('/')
                 masanpham: req.body.masanpham
             }
         });
+
+        const thongtinsanpham = await SanPham.findOne({
+            where: {
+                masanpham: req.body.masanpham
+            },
+            include: [DanhMuc, AnhSanPham, TaiKhoan]
+        })
+
         let giadat = req.body.gia
         let bool2 = true
         let bool3 = true
-        if (sanpham != undefined) {
-            if (parseInt(req.body.gia) < sanpham.gia) {
-                bool2 = false
+        let nguoichienthang = undefined
+
+        if (parseInt(req.body.gia) >= thongtinsanpham.giamuangay && bool) {
+            nguoichienthang = req.body.mataikhoan
+            console.log('nguoichienthang ' + nguoichienthang)
+            customer = await LichSuDauGia.create({
+                masanpham: req.body.masanpham,
+                mataikhoan: req.body.mataikhoan,
+                gia: thongtinsanpham.giamuangay,
+                giacaonhat: thongtinsanpham.giamuangay,
+            });
+            actor = await SanPham.update({
+                malichsucaonhat: customer.malichsudaugia,
+                nguoichienthang: nguoichienthang
+            },
+                {
+                    where: {
+                        masanpham: req.body.masanpham,
+                    },
+                });
+            await Email.send(thongtinsanpham.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+            await Email.send(user.email, 'Bạn đã đấu giá thành công!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+
+            if (sanpham != undefined) {
+                await TaiKhoan.findOne({
+                    where: {
+                        mataikhoan: sanpham.mataikhoan
+                    }
+                }).then(async (e) => {
+                    if (e.email != user.email) {
+                        await Email.send(e.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+
+                        const result = {
+                            danhgia: ratio,
+                            status: true,
+                            messenger: 'Bạn đã chiến thắng đấu giá với giá mua ngay!'
+                        }
+
+                        res.status(200).json(result);
+                    }
+                })
             }
 
+            if (sanpham != undefined) {
+                if (parseInt(req.body.gia) < sanpham.gia) {
+                    bool2 = false
+                }
 
-            if (!sanpham.giacaonhat) {
-                giadat = sanpham.giakhoidiem
-            } else {
-                if (parseInt(req.body.gia) <= sanpham.giacaonhat) {
-                    bool3 = false
-                    customer = await LichSuDauGia.create({
-                        masanpham: req.body.masanpham,
-                        mataikhoan: sanpham.mataikhoan,
-                        gia: req.body.gia,
-                        giacaonhat: sanpham.giacaonhat,
-                    }).then(async (e) => {
-                        actor = await SanPham.update({
-                            malichsucaonhat: e.malichsudaugia
-                        },
-                            {
-                                where: {
-                                    masanpham: req.body.masanpham,
-                                },
-                            })
-                        const thongtinsanpham = await SanPham.findOne({
-                            where: {
-                                masanpham: req.body.masanpham
-                            },
-                            include: [DanhMuc, AnhSanPham, TaiKhoan]
+
+                if (!sanpham.giacaonhat) {
+                    giadat = sanpham.giakhoidiem
+                } else {
+                    if (parseInt(req.body.gia) <= sanpham.giacaonhat) {
+                        bool3 = false
+                        customer = await LichSuDauGia.create({
+                            masanpham: req.body.masanpham,
+                            mataikhoan: sanpham.mataikhoan,
+                            gia: req.body.gia,
+                            giacaonhat: sanpham.giacaonhat,
                         }).then(async (e) => {
-                            await Email.send(e.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+                            actor = await SanPham.update({
+                                malichsucaonhat: e.malichsudaugia,
+                                nguoichienthang: nguoichienthang
+                            },
+                                {
+                                    where: {
+                                        masanpham: req.body.masanpham,
+                                    },
+                                })
+
+
+                            if (thongtinsanpham.tudonggiahan) {
+                
+                                const thoigian = (thongtinsanpham.ngayketthuc - new Date()) / 1000
+                                //5 phut
+                                if (thoigian >= 0 && thoigian <= 300) {
+                                    let ngayketthucnew = thongtinsanpham.ngayketthuc
+                                    ngayketthucnew.setSeconds(ngayketthucnew.getSeconds() + 300)
+                
+                                    await SanPham.update({
+                                        ngayketthuc: ngayketthucnew,
+                                    }, {
+                                        where: {
+                                            masanpham: req.body.masanpham,
+                                        },
+                                    })
+                                }
+                            }
+
+                            await Email.send(thongtinsanpham.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
                             const abc = await TaiKhoan.findOne({
                                 where: {
                                     mataikhoan: sanpham.mataikhoan
@@ -146,19 +212,13 @@ app.route('/')
                                 await Email.send(e.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
                             })
                         })
-                    })
-                }
-                else {
-                    const thongtinsanpham = await SanPham.findOne({
-                        where: {
-                            masanpham: req.body.masanpham
-                        }
-                    }).then((e) => {
-                        giadat = parseInt(sanpham.giacaonhat) + parseInt(e.buocgia)
-                    })
+
+                    }
+                    else {
+                        giadat = parseInt(sanpham.giacaonhat) + parseInt(thongtinsanpham.buocgia)
+                    }
                 }
             }
-
         }
         noidung = bool2 ? noidung : 'Giá cược không hợp lệ ' + req.body.gia + ' < ' + sanpham.gia
         noidung = bool3 ? noidung : 'Cược không thành công, người khác đã đặt giá cao hơn'
@@ -178,35 +238,47 @@ app.route('/')
                 giacaonhat: req.body.gia,
             });
             actor = await SanPham.update({
-                malichsucaonhat: customer.malichsudaugia
+                malichsucaonhat: customer.malichsudaugia,
+                nguoichienthang: nguoichienthang
             },
                 {
                     where: {
                         masanpham: req.body.masanpham,
                     },
                 });
-            const thongtinsanpham = await SanPham.findOne({
-                where: {
-                    masanpham: req.body.masanpham
-                },
-                include: [DanhMuc, AnhSanPham, TaiKhoan]
-            }).then(async (e) => {
-                await Email.send(e.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
-                await Email.send(user.email, 'Bạn đã đấu giá thành công!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
 
-                if (sanpham != undefined) {
-                    await TaiKhoan.findOne({
+            if (thongtinsanpham.tudonggiahan) {
+                
+                const thoigian = (thongtinsanpham.ngayketthuc - new Date()) / 1000
+                //5 phut
+                if (thoigian >= 0 && thoigian <= 300) {
+                    let ngayketthucnew = thongtinsanpham.ngayketthuc
+                    ngayketthucnew.setSeconds(ngayketthucnew.getSeconds() + 300)
+
+                    await SanPham.update({
+                        ngayketthuc: ngayketthucnew,
+                    }, {
                         where: {
-                            mataikhoan: sanpham.mataikhoan
-                        }
-                    }).then(async (e) => {
-                        if (e.email != user.email){
-                            await Email.send(e.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
-                        }
+                            masanpham: req.body.masanpham,
+                        },
                     })
                 }
-            })
+            }
 
+            await Email.send(thongtinsanpham.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+            await Email.send(user.email, 'Bạn đã đấu giá thành công!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+
+            if (sanpham != undefined) {
+                await TaiKhoan.findOne({
+                    where: {
+                        mataikhoan: sanpham.mataikhoan
+                    }
+                }).then(async (e) => {
+                    if (e.email != user.email) {
+                        await Email.send(e.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+                    }
+                })
+            }
         }
         res.status(200).json(result);
     })

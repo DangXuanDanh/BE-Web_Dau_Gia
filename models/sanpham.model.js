@@ -78,6 +78,9 @@ SanPham.init({
     luot_ra_gia_hien_tai: {
         type: Sequelize.INTEGER,
     },
+    nguoichienthang: {
+        type: Sequelize.INTEGER,
+    },
 }, {
     // Other model options go here
     freezeTableName: true,
