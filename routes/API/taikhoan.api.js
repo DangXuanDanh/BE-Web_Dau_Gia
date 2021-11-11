@@ -48,33 +48,34 @@ app.route('/login')
             var email = body.email;
             var datetemp = new Date();
             const user = await TaiKhoan.findByMail(body.email);
-            if (user.exp_seller <= datetemp) {
-                const userdetal = {
-                    role: 1,
-                }
-                const result = await TaiKhoan.patch(user.mataikhoan, userdetal);
-                user.role = 1;
-            }
-
             if (user === null) {
                 return res.status(204).end();
-            }
-            const hashed = user.matkhau;
-            var validUser = bcrypt.compareSync(body.password, hashed)
-
-            if (validUser) {
-                const userReturned = {
-                    mataikhoan: user.mataikhoan,
-                    hoten: user.hoten,
-                    status: user.activate_status,
-                    role: user.role,
-                    activate_upgrade: user.activate_upgrade,
-                    exp_seller: user.exp_seller
+            }else{
+                if (user.exp_seller <= datetemp) {
+                    const userdetal = {
+                        role: 1,
+                    }
+                    const result = await TaiKhoan.patch(user.mataikhoan, userdetal);
+                    user.role = 1;
                 }
-                return res.json(userReturned).status(200).end();
-            } else {
-                return res.status(403).end();
+                const hashed = user.matkhau;
+                var validUser = bcrypt.compareSync(body.password, hashed)
+    
+                if (validUser) {
+                    const userReturned = {
+                        mataikhoan: user.mataikhoan,
+                        hoten: user.hoten,
+                        status: user.activate_status,
+                        role: user.role,
+                        activate_upgrade: user.activate_upgrade,
+                        exp_seller: user.exp_seller
+                    }
+                    return res.json(userReturned).status(200).end();
+                } else {
+                    return res.status(403).end();
+                }
             }
+           
 
         }
 
@@ -219,7 +220,7 @@ app.route('/degrade/:userId')
         }
     })
 app.route('/change-profile-password')
-    .post(async (req, res) => {
+    .patch(async (req, res) => {
         const body = req.body;
         if (body === null || body === 0) {
             return res.status(404).end();
@@ -243,6 +244,21 @@ app.route('/change-profile-password')
                 } else {
                     return res.status(400).end();
                 }
+            }
+        }
+    })
+    
+    .post(async (req, res) => {
+        const body = req.body;
+        if (body === null || body === 0) {
+            return res.status(404).end();
+        } else {
+            const user_record = await TaiKhoan.findByMail(body.email);
+            console.log("--------------------------------,," + user_record)
+            if (user_record === null || user_record === 0) {
+                return res.status(404).end();
+            } else {
+                return res.status(200).end();
             }
         }
     });

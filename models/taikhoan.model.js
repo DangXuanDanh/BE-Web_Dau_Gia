@@ -11,9 +11,6 @@ class TaiKhoan extends Model {
                 email,
             }
         })
-        if (rows.length === 0) {
-            return null;
-        }
         return rows;
     }
 
@@ -23,9 +20,6 @@ class TaiKhoan extends Model {
                 mataikhoan: id,
             }
         })
-        if (rows.length === 0) {
-            return null;
-        }
         return rows;
     }
 
@@ -36,9 +30,6 @@ class TaiKhoan extends Model {
                 role : 1
             }
         })
-        if (rows.length === 0) {
-            return null;
-        }
         return rows;
     }
 
