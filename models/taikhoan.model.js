@@ -27,7 +27,7 @@ class TaiKhoan extends Model {
         const rows = await TaiKhoan.findAll({
             where: {
                 activate_upgrade: activate_upgrade,
-                role : 1
+                role: 1
             }
         })
         return rows;
@@ -36,10 +36,10 @@ class TaiKhoan extends Model {
     static patch(id, user_noId) {
         return TaiKhoan.update(
             user_noId, {
-                where: {
-                    mataikhoan: id,
-                },
-            });
+            where: {
+                mataikhoan: id,
+            },
+        });
     }
 
     static delete(id) {
@@ -85,14 +85,17 @@ TaiKhoan.init({
     danhgiaxau: {
         type: Sequelize.INTEGER,
     },
-    role:{
+    role: {
         type: Sequelize.INTEGER,
     },
-    activate_upgrade:{
+    activate_upgrade: {
         type: Sequelize.INTEGER,
     },
-    exp_seller:{
+    exp_seller: {
         type: 'TIMESTAMP',
+    },
+    otd_code: {
+        type: Sequelize.STRING,
     },
 }, {
     // Other model options go here

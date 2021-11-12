@@ -6,6 +6,8 @@ const Sequelize = require('sequelize')
 const { Op } = require('sequelize')
 const bcrypt = require('bcrypt');
 
+const Email = require('../../services/mailer');
+
 const saltRounds = 10;
 
 const TaiKhoan = require('../../models/taikhoan.model');
@@ -50,7 +52,7 @@ app.route('/login')
             const user = await TaiKhoan.findByMail(body.email);
             if (user === null) {
                 return res.status(204).end();
-            }else{
+            } else {
                 if (user.exp_seller <= datetemp) {
                     const userdetal = {
                         role: 1,
@@ -60,7 +62,7 @@ app.route('/login')
                 }
                 const hashed = user.matkhau;
                 var validUser = bcrypt.compareSync(body.password, hashed)
-    
+
                 if (validUser) {
                     const userReturned = {
                         mataikhoan: user.mataikhoan,
@@ -75,7 +77,7 @@ app.route('/login')
                     return res.status(403).end();
                 }
             }
-           
+
 
         }
 
@@ -247,20 +249,84 @@ app.route('/change-profile-password')
             }
         }
     })
-    
+
     .post(async (req, res) => {
         const body = req.body;
         if (body === null || body === 0) {
             return res.status(404).end();
         } else {
             const user_record = await TaiKhoan.findByMail(body.email);
-            console.log("--------------------------------,," + user_record)
             if (user_record === null || user_record === 0) {
                 return res.status(404).end();
             } else {
+                var code = randomString();
+                const userdetal = {
+                    otd_code: code,
+                }
+                const result = await TaiKhoan.patch(user_record.mataikhoan, userdetal);
+                await Email.send(body.email, 'Reset Password', `Mã xác nhận : ${code}`);
                 return res.status(200).end();
             }
         }
-    });
+    })
+
+    .put(async (req, res) => {
+        const body = req.body;
+        if (body === null || body === 0) {
+            return res.status(404).end();
+        } else {
+            const user_record = await TaiKhoan.findByMail(body.email);
+            if (user_record === null || user_record === 0) {
+                return res.status(404).end();
+            } else {
+                if (user_record.otd_code === body.otd_code) {
+                    const userReturned = {
+                        mataikhoan: user_record.mataikhoan,
+                    }
+                    return res.json(userReturned).status(200).end();
+                } else {
+                    return res.status(404).end();
+                }
+                /*var code = randomString();
+                const userdetal = {
+                    otd_code: code,
+                }
+                const result = await TaiKhoan.patch(user_record.mataikhoan, userdetal);
+                await Email.send(body.email, 'Reset Password', `Mã xác nhận : ${code}`);
+                return res.status(200).end();*/
+            }
+        }
+    })
+app.route('/change-password')
+    .patch(async (req, res) => {
+        const body = req.body;
+        if (body === null || body === 0) {
+            return res.status(404).end();
+        } else {
+            const user_record = await TaiKhoan.findById(body.mataikhoan);
+            if (user_record === null || user_record === 0) {
+                return res.status(404).end();
+            } else {
+                const user = {
+                    matkhau: user_record.matkhau,
+                }
+                const userId = user_record.mataikhoan;
+                const salt = bcrypt.genSaltSync(saltRounds);
+                var newPassword = bcrypt.hashSync(body.newPassword, salt);
+                user.matkhau = newPassword;
+                await TaiKhoan.patch(userId, user);
+                return res.status(200).end();
+            }
+        }
+    })
+    ;
+
+function randomString() {
+    var result = '';
+    var length = 12;
+    var chars = '0123456789';
+    for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+    return result;
+}
 
 module.exports = app;
