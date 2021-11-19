@@ -101,6 +101,25 @@ app.route('/')
             });
         res.json(actor);
     })
+    
+    //lấy sản phẩm của người bán
+    app.route('/detail/:userId')
+    .get(async function (req, res, next) {
+        actors = await SanPham.findAll({
+            order: [
+                ['ngaydang', 'DESC']
+            ],
+            where:{
+                manguoidang: req.params.userId,
+                ngayketthuc: {
+                    [Op.gte]: Sequelize.literal('CURRENT_TIMESTAMP')
+                  },
+                is_delete : 0
+            }
+        });
+        res.status(200).json(actors);
+    })
+
 //5 San pham co gia cao nhat
 app.route('/get/MaxPrice').get(async function (req, res) {
         let sp = await SanPham.selectRawQuery('SELECT * FROM sanpham order by giamuangay desc LIMIT :limit',{ limit: 5 })
