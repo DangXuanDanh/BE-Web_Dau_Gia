@@ -133,7 +133,12 @@ app.route('/get/NearEnd').get(async function (req, res) {
     LIMIT :limit`,{ limit: 5 })
     res.status(200).json(sp);
 })    
- 
+ //Tim kiem san pham theo ten
+app.route('/get/Name/:name').get(async function (req, res) {
+    let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
+    WHERE lower(tensanpham) like :name`,{ name: "%"+req.params.name+"%" })
+    res.status(200).json(sp);
+})   
 app.route('/get/Count').get(async function (req, res) {
     let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
     order by luot_ra_gia_hien_tai desc
