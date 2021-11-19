@@ -14,6 +14,15 @@ class TaiKhoan extends Model {
         return rows;
     }
 
+    static async findByCode(code) {
+        const rows = await TaiKhoan.findOne({
+            where: {
+                otd_code: code,
+            }
+        })
+        return rows;
+    }
+
     static async findById(id) {
         const rows = await TaiKhoan.findOne({
             where: {
