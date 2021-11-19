@@ -50,10 +50,11 @@ app.route('/login')
             var email = body.email;
             var datetemp = new Date();
             const user = await TaiKhoan.findByMail(body.email);
+            console.log("---------------"+user.role)
             if (user === null) {
                 return res.status(204).end();
             } else {
-                if (user.exp_seller <= datetemp) {
+                if (user.exp_seller <= datetemp && user.role == 2) {
                     const userdetal = {
                         role: 1,
                     }
@@ -64,6 +65,7 @@ app.route('/login')
                 var validUser = bcrypt.compareSync(body.password, hashed)
 
                 if (validUser) {
+                    console.log("---------------"+user.role)
                     const userReturned = {
                         mataikhoan: user.mataikhoan,
                         hoten: user.hoten,
