@@ -220,16 +220,10 @@ app.route('/')
             }
 
             // dau gia tu dong
-            console.log("---------------")
-            console.log(oldLSDG.giacaonhat)
-            console.log("---------------")
             if (!oldLSDG.giacaonhat) {
                 giadat = oldLSDG.giakhoidiem
             } else {
                 if (parseInt(req.body.gia) <= oldLSDG.giacaonhat) {
-                    console.log("---------------")
-                    console.log("jqwhdqwdqwdqw")
-                    console.log("---------------")
                     bool3 = false
                     customer = await LichSuDauGia.create({
                         masanpham: req.body.masanpham,
