@@ -1,5 +1,6 @@
 const express = require('express');
 const app = new express.Router();
+const { Op } = require('sequelize')
 
 const LichSuDauGia = require('../../models/lichsudaugia.model');
 const SanPham = require('../../models/sanpham.model');
@@ -29,7 +30,7 @@ function validate() {
 }
 
 
-app.route('/:id')
+app.route('/find/:id')
     .get(async function (req, res) {
         res.status(200).json(await LichSuDauGia.findOne({
             where: {
@@ -45,6 +46,44 @@ app.route('/:id')
             },
         });
         res.status(204).json(customer);
+    })
+
+app.route('/deny/:mataikhoan/:masanpham')
+    .get(async function (req, res) {
+        const newlsdg = await LichSuDauGia.findOne({
+            where: {
+                masanpham: req.params.masanpham,
+                mataikhoan: {
+                    [Op.ne]: req.params.mataikhoan
+                },
+            },
+            order: [
+                ['ngaydaugia', 'DESC']
+            ],
+            include: [TaiKhoan]
+        })
+
+        await SanPham.update({
+            malichsucaonhat: newlsdg ? newlsdg.malichsudaugia : undefined
+        },
+            {
+                where: {
+                    masanpham: req.params.masanpham,
+                },
+            })
+        await LichSuDauGia.destroy({
+            where: {
+                masanpham: req.params.masanpham,
+                mataikhoan: req.params.mataikhoan,
+            }
+        })
+        const user = await TaiKhoan.findOne({
+            where: {
+                mataikhoan: req.params.mataikhoan,
+            },
+        })
+        await Email.send(user.email, 'Bạn vừa bị từ chối đấu giá sản phẩm!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.params.masanpham} để xem ngay!`);
+        res.status(200).json();
     })
 
 app.route('/sanpham/:id')
@@ -94,7 +133,7 @@ app.route('/')
             noidung = bool ? noidung : 'Không đủ điểm đánh giá'
         }
 
-        const sanpham = await LichSuDauGia.findOne({
+        const oldLSDG = await LichSuDauGia.findOne({
             order: [
                 ['ngaydaugia', 'DESC']
             ],
@@ -111,14 +150,15 @@ app.route('/')
             include: [DanhMuc, AnhSanPham, TaiKhoan]
         })
 
+        // het han dau gia
         const thoigian = (thongtinsanpham.ngayketthuc - new Date()) / 1000
-        if (thoigian <= 0){
+        if (thoigian <= 0) {
             const result = {
                 danhgia: ratio,
                 status: false,
                 messenger: 'Sản phẩm đã hết hạn đấu giá'
             }
-    
+
             res.status(200).json(result);
             return
         }
@@ -129,6 +169,7 @@ app.route('/')
         let bool3 = true
         let nguoichienthang = undefined
 
+        // co the mua ngay
         if (parseInt(req.body.gia) >= thongtinsanpham.giamuangay && bool) {
             nguoichienthang = req.body.mataikhoan
             console.log('nguoichienthang ' + nguoichienthang)
@@ -150,10 +191,10 @@ app.route('/')
             await Email.send(thongtinsanpham.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
             await Email.send(user.email, 'Bạn đã đấu giá thành công!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
 
-            if (sanpham != undefined) {
+            if (oldLSDG != undefined) {
                 await TaiKhoan.findOne({
                     where: {
-                        mataikhoan: sanpham.mataikhoan
+                        mataikhoan: oldLSDG.mataikhoan
                     }
                 }).then(async (e) => {
                     if (e.email != user.email) {
@@ -166,74 +207,86 @@ app.route('/')
                         }
 
                         res.status(200).json(result);
+                        return
                     }
                 })
             }
+        }
 
-            if (sanpham != undefined) {
-                if (parseInt(req.body.gia) < sanpham.gia) {
-                    bool2 = false
-                }
+        // co nguoi nao dau gia roi hay khong
+        if (oldLSDG != undefined) {
+            if (parseInt(req.body.gia) < oldLSDG.gia) {
+                bool2 = false
+            }
+
+            // dau gia tu dong
+            console.log("---------------")
+            console.log(oldLSDG.giacaonhat)
+            console.log("---------------")
+            if (!oldLSDG.giacaonhat) {
+                giadat = oldLSDG.giakhoidiem
+            } else {
+                if (parseInt(req.body.gia) <= oldLSDG.giacaonhat) {
+                    console.log("---------------")
+                    console.log("jqwhdqwdqwdqw")
+                    console.log("---------------")
+                    bool3 = false
+                    customer = await LichSuDauGia.create({
+                        masanpham: req.body.masanpham,
+                        mataikhoan: oldLSDG.mataikhoan,
+                        gia: req.body.gia,
+                        giacaonhat: oldLSDG.giacaonhat,
+                    }).then(async (e) => {
+                        actor = await SanPham.update({
+                            malichsucaonhat: e.malichsudaugia,
+                            nguoichienthang: nguoichienthang
+                        },
+                            {
+                                where: {
+                                    masanpham: req.body.masanpham,
+                                },
+                            })
 
 
-                if (!sanpham.giacaonhat) {
-                    giadat = sanpham.giakhoidiem
-                } else {
-                    if (parseInt(req.body.gia) <= sanpham.giacaonhat) {
-                        bool3 = false
-                        customer = await LichSuDauGia.create({
-                            masanpham: req.body.masanpham,
-                            mataikhoan: sanpham.mataikhoan,
-                            gia: req.body.gia,
-                            giacaonhat: sanpham.giacaonhat,
-                        }).then(async (e) => {
-                            actor = await SanPham.update({
-                                malichsucaonhat: e.malichsudaugia,
-                                nguoichienthang: nguoichienthang
-                            },
-                                {
+                        if (thongtinsanpham.tudonggiahan) {
+
+                            const thoigian = (thongtinsanpham.ngayketthuc - new Date()) / 1000
+                            //5 phut
+                            if (thoigian >= 0 && thoigian <= 300) {
+                                let ngayketthucnew = thongtinsanpham.ngayketthuc
+                                ngayketthucnew.setSeconds(ngayketthucnew.getSeconds() + 300)
+
+                                await SanPham.update({
+                                    ngayketthuc: ngayketthucnew,
+                                }, {
                                     where: {
                                         masanpham: req.body.masanpham,
                                     },
                                 })
-
-
-                            if (thongtinsanpham.tudonggiahan) {
-                
-                                const thoigian = (thongtinsanpham.ngayketthuc - new Date()) / 1000
-                                //5 phut
-                                if (thoigian >= 0 && thoigian <= 300) {
-                                    let ngayketthucnew = thongtinsanpham.ngayketthuc
-                                    ngayketthucnew.setSeconds(ngayketthucnew.getSeconds() + 300)
-                
-                                    await SanPham.update({
-                                        ngayketthuc: ngayketthucnew,
-                                    }, {
-                                        where: {
-                                            masanpham: req.body.masanpham,
-                                        },
-                                    })
-                                }
                             }
+                        }
 
-                            await Email.send(thongtinsanpham.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
-                            const abc = await TaiKhoan.findOne({
-                                where: {
-                                    mataikhoan: sanpham.mataikhoan
-                                }
-                            }).then(async (e) => {
-                                await Email.send(e.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
-                            })
+                        await Email.send(thongtinsanpham.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
+                        const abc = await TaiKhoan.findOne({
+                            where: {
+                                mataikhoan: oldLSDG.mataikhoan
+                            }
+                        }).then(async (e) => {
+                            await Email.send(e.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
                         })
+                    })
 
-                    }
-                    else {
-                        giadat = parseInt(sanpham.giacaonhat) + parseInt(thongtinsanpham.buocgia)
-                    }
+                }
+                else {
+                    giadat = parseInt(oldLSDG.giacaonhat) + parseInt(thongtinsanpham.buocgia)
                 }
             }
         }
-        noidung = bool2 ? noidung : 'Giá cược không hợp lệ ' + req.body.gia + ' < ' + sanpham.gia
+        else {
+            giadat = parseInt(thongtinsanpham.giakhoidiem) + parseInt(thongtinsanpham.buocgia)
+        }
+
+        noidung = bool2 ? noidung : 'Giá cược không hợp lệ ' + req.body.gia + ' < ' + oldLSDG.gia
         noidung = bool3 ? noidung : 'Cược không thành công, người khác đã đặt giá cao hơn'
 
         const result = {
@@ -242,6 +295,7 @@ app.route('/')
             messenger: noidung
         }
 
+        // neu la nguoi dau tien dau gia
         if (bool && bool2 && bool3) {
             console.log("dau gia thanh cong ")
             customer = await LichSuDauGia.create({
@@ -260,8 +314,9 @@ app.route('/')
                     },
                 });
 
+            // tu dong gia han
             if (thongtinsanpham.tudonggiahan) {
-                
+
                 const thoigian = (thongtinsanpham.ngayketthuc - new Date()) / 1000
                 //5 phut
                 if (thoigian >= 0 && thoigian <= 300) {
@@ -281,10 +336,10 @@ app.route('/')
             await Email.send(thongtinsanpham.taikhoan.email, 'Giá cược mới vừa được cập nhật!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
             await Email.send(user.email, 'Bạn đã đấu giá thành công!', `Vào ${process.env.BASE_URL || 'http://localhost:5000'}/detail?id=${req.body.masanpham} để xem ngay!`);
 
-            if (sanpham != undefined) {
+            if (oldLSDG != undefined) {
                 await TaiKhoan.findOne({
                     where: {
-                        mataikhoan: sanpham.mataikhoan
+                        mataikhoan: oldLSDG.mataikhoan
                     }
                 }).then(async (e) => {
                     if (e.email != user.email) {
