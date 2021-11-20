@@ -58,6 +58,28 @@ class TaiKhoan extends Model {
             },
         });
     }
+
+    static async selectRawQuery(query,replace) {
+        return TaiKhoan.sequelize.query(query,
+            {
+                replacements: replace,
+                type: Sequelize.SELECT,
+                model: TaiKhoan,
+                mapToModel: true
+            } 
+        );
+    }
+
+    static async updateRawQuery(query,replace) {
+        return TaiKhoan.sequelize.query(query,
+            {
+                replacements: replace,
+                type: Sequelize.UPDATE,
+                model: TaiKhoan,
+                mapToModel: true
+            } 
+        );
+    }
 }
 // chat Table Created Method
 TaiKhoan.init({
