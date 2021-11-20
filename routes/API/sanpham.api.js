@@ -7,6 +7,7 @@ const SanPham = require('../../models/sanpham.model');
 const DanhMuc = require('../../models/danhmuc.model');
 const AnhSanPham = require('../../models/anhsanpham.model');
 const TaiKhoan = require('../../models/taikhoan.model');
+const url = require('url');
 
 function validate() {
     return async function (req, res, next) {
@@ -134,9 +135,14 @@ app.route('/get/NearEnd').get(async function (req, res) {
     res.status(200).json(sp);
 })    
  //Tim kiem san pham theo ten
-app.route('/get/Name/:name').get(async function (req, res) {
-    let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
-    WHERE lower(tensanpham) like :name`,{ name: "%"+req.params.name+"%" })
+app.route('/get/Name').get(async function (req, res) {
+    const queryObject = url.parse(req.url,true).query;
+    let sql=`SELECT (select count(masanpham) from sanpham WHERE lower(tensanpham) like :name) as sl,* FROM sanpham 
+    WHERE lower(tensanpham) like :name`;
+    (queryObject.orderType) ? sql+=" order by "+queryObject.orderType:sql+="";
+    (queryObject.orderBy) ? sql+=" desc":sql+="";
+    sql+=` LIMIT 8 OFFSET :offset`
+    let sp = await SanPham.selectRawQuery(sql,{ name: "%"+queryObject.name+"%", offset: (queryObject.page-1)*8})
     res.status(200).json(sp);
 })   
 app.route('/get/Count').get(async function (req, res) {
