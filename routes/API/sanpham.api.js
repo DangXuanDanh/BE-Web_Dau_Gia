@@ -155,7 +155,7 @@ app.route('/get/New/:danhmuc').get(async function (req, res) {
 //5 San pham gan ket thuc    
 app.route('/get/NearEnd').get(async function (req, res) {
     let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham 
-    WHERE (interval '0 days')<=age(ngayketthuc,CURRENT_TIMESTAMP) and age(ngayketthuc,CURRENT_TIMESTAMP)<=(interval '3 days') and (sanpham.ngayketthuc < :ngayketthuc or sanpham.nguoichienthang is null)
+    WHERE (interval '0 days')<=age(ngayketthuc,CURRENT_TIMESTAMP) and age(ngayketthuc,CURRENT_TIMESTAMP)<=(interval '14 days') and (sanpham.ngayketthuc < :ngayketthuc or sanpham.nguoichienthang is null)
     LIMIT :limit`, { limit: 5, ngayketthuc: new Date() })
     res.status(200).json(sp);
 })
