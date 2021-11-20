@@ -183,7 +183,7 @@ app.route('/get/Name').get(async function (req, res) {
 })   
 app.route('/get/Count').get(async function (req, res) {
     let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham join lichsudaugia on sanpham.malichsucaonhat = lichsudaugia.malichsudaugia where (sanpham.ngayketthuc > :ngayketthuc and sanpham.nguoichienthang is null) 
-    order by lichsudaugia.gia
+    order by lichsudaugia.gia desc
     LIMIT :limit`, { limit: 5, ngayketthuc: new Date() })
     res.status(200).json(sp);
 })
