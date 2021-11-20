@@ -111,6 +111,19 @@ app.route('/')
             include: [DanhMuc, AnhSanPham, TaiKhoan]
         })
 
+        const thoigian = (thongtinsanpham.ngayketthuc - new Date()) / 1000
+        if (thoigian <= 0){
+            const result = {
+                danhgia: ratio,
+                status: false,
+                messenger: 'Sản phẩm đã hết hạn đấu giá'
+            }
+    
+            res.status(200).json(result);
+            return
+        }
+
+
         let giadat = req.body.gia
         let bool2 = true
         let bool3 = true
