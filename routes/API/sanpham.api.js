@@ -169,7 +169,18 @@ app.route('/get/Name').get(async function (req, res) {
     sql += ` LIMIT 8 OFFSET :offset`
     let sp = await SanPham.selectRawQuery(sql, { name: "%" + queryObject.name + "%", offset: (queryObject.page - 1) * 8, ngayketthuc: new Date() })
     res.status(200).json(sp);
-})
+})   
+ //Tim kiem san pham theo category
+ app.route('/get/category').get(async function (req, res) {
+    const queryObject = url.parse(req.url,true).query;
+    let sql=`SELECT (select count(masanpham) from sanpham WHERE madanhmuc=:madanhmuc) as sl,* FROM sanpham 
+    WHERE madanhmuc=:madanhmuc`;
+    (queryObject.orderType) ? sql+=" order by "+queryObject.orderType:sql+="";
+    (queryObject.orderBy) ? sql+=" desc":sql+="";
+    sql+=` LIMIT 8 OFFSET :offset`
+    let sp = await SanPham.selectRawQuery(sql,{ madanhmuc: queryObject.id, offset: (queryObject.page-1)*8})
+    res.status(200).json(sp);
+})   
 app.route('/get/Count').get(async function (req, res) {
     let sp = await SanPham.selectRawQuery(`SELECT * FROM sanpham join lichsudaugia on sanpham.malichsucaonhat = lichsudaugia.malichsudaugia where (sanpham.ngayketthuc > :ngayketthuc and sanpham.nguoichienthang is null) 
     order by lichsudaugia.gia
