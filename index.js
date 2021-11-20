@@ -33,10 +33,14 @@ app.use('/API/lichsudaugia', require('./routes/API/lichsudaugia.api'))
 app.use('/API/user', require('./routes/API/taikhoan.api'))
 app.use('/API/danhmuc', require('./routes/API/danhmuc.api'))
 app.use('/API/anhsanpham', require('./routes/API/anhsanpham.api'))
+app.use('/API/yeuthich', require('./routes/API/yeuthich.api'))
 
 app.listen(PORT, async function () {
     console.log(`Server is running at http://localhost:${PORT}`);
-    db.sync({ alter: process.env.DB_SYNC == 'true' }).then(() => {
+    db.sync(
+        // { alter: process.env.DB_SYNC == 'true' }
+        // { alter: true}
+        ).then(() => {
         console.log(`db connected success`);
     }).catch(function (error) {
         // fail case

@@ -39,11 +39,68 @@ app.route('/allactivate_upgrade')
         return res.json(user).status(200).end();
     })
 
+app.route('/register')
+    .post(async function (req, res) {
+        const body = req.body;
+
+        const user = await TaiKhoan.findByMail(body.email);
+        if (user === null) {
+            const salt = bcrypt.genSaltSync(saltRounds);
+            const hash = bcrypt.hashSync(body.password, salt);
+            var code = randomString();
+
+            const regUser = {
+                hoten: body.hoten,
+                email: body.email,
+                ngaysinh: body.ngaysinh,
+                diachi: body.diachi,
+                matkhau: hash,
+                role: 1,
+                danhgiatot: 0,
+                danhgiaxau: 0,
+                activate_status: 0,
+                activate_upgrade: 0,
+                otd_code: code
+            }
+            const result = await TaiKhoan.create(regUser);
+
+            await Email.send(body.email, 'Active Account', `Mã xác nhận : Vào ${process.env.BASE_URL || 'http://localhost:5000'}/activeAccount/${code} để kích hoạt tài khoản!`);
+            return res.json({
+                message: "user created"
+            }).status(200).end();
+        }
+        else {
+            return res.status(304).end();
+        }
+    })
+
+app.route('/activate-account')
+    .post(async function (req, res) {
+        const activate_code = req.body.code;
+        if (activate_code === 0 || activate_code === null) {
+            return res.status(404).end();
+        }
+        else {
+            const result = await TaiKhoan.findByCode(activate_code);
+            if (result === 0 || result === null) {
+                return res.status(404).end();
+            }
+            else {
+                const userID = result.mataikhoan;
+                const user = {
+                    activate_status: 1,
+                }
+                await TaiKhoan.patch(userID, user);
+                return res.json({
+                    message: "User activation successfully"
+                }).status(200).end();
+            }
+        }
+    })
 
 app.route('/login')
     .post(async function (req, res) {
         const body = req.body;
-        console.log(body);
         if (body.email == null || body.password == null) {
             return res.status(403).end();
         } else {
@@ -53,7 +110,7 @@ app.route('/login')
             if (user === null) {
                 return res.status(204).end();
             } else {
-                if (user.exp_seller <= datetemp) {
+                if (user.exp_seller <= datetemp && user.role == 2) {
                     const userdetal = {
                         role: 1,
                     }
@@ -64,6 +121,7 @@ app.route('/login')
                 var validUser = bcrypt.compareSync(body.password, hashed)
 
                 if (validUser) {
+                    console.log("---------------" + user.role)
                     const userReturned = {
                         mataikhoan: user.mataikhoan,
                         hoten: user.hoten,
